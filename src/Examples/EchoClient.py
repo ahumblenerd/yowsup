@@ -23,21 +23,23 @@ import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 import time
-
+import sqlite3 as lite
+import sys
+#CONSTANTS
+pathdb = '/root/Desktop/project/Record.db' #DB Path Changes on the main machine
 from Yowsup.connectionmanager import YowsupConnectionManager
 
 class WhatsappEchoClient:
 	
 	def __init__(self, target, message, waitForReceipt=False):
+               
 		
-		self.jids = []
+		self.jids = target
 		
-		if '-' in target:
-			self.jids = ["%s@g.us" % target]
-		else:
-			self.jids = ["%s@s.whatsapp.net" % t for t in target.split(',')]
+	
 
 		self.message = message
+
 		self.waitForReceipt = waitForReceipt
 		
 		connectionManager = YowsupConnectionManager()
@@ -67,10 +69,10 @@ class WhatsappEchoClient:
 			self.methodsInterface.call("ready")
 		
 		
-		if len(self.jids) > 1:
-			self.methodsInterface.call("message_broadcast", (self.jids, self.message))
-		else:
-			self.methodsInterface.call("message_send", (self.jids[0], self.message))
+#		if len(self.jids) > 1:
+		self.methodsInterface.call("message_broadcast", (self.jids, self.message))
+#		else:
+#			self.methodsInterface.call("message_send", (self.jids[0], self.message))
 		print("Sent message")
 		if self.waitForReceipt:
 			timeout = 5

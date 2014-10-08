@@ -1,21 +1,21 @@
 '''
 Copyright (c) <2012> Tarek Galal <tare2.galal@gmail.com>
 
-Permission is hereby granted, free of charge, to any person obtaining a copy of this 
-software and associated documentation files (the "Software"), to deal in the Software 
-without restriction, including without limitation the rights to use, copy, modify, 
-merge, publish, distribute, sublicense, and/or sell copies of the Software, and to 
-permit persons to whom the Software is furnished to do so, subject to the following 
+Permission is hereby granted, free of charge, to any person obtaining a copy of this
+software and associated documentation files (the "Software"), to deal in the Software
+without restriction, including without limitation the rights to use, copy, modify,
+merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+permit persons to whom the Software is furnished to do so, subject to the following
 conditions:
 
-The above copyright notice and this permission notice shall be included in all 
+The above copyright notice and this permission notice shall be included in all
 copies or substantial portions of the Software.
 
-THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, 
-INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR 
-A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT 
-HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF 
-CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE 
+THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR
+A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT
+HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF
+CONTRACT, TORT OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE
 OR THE USE OR OTHER DEALINGS IN THE SOFTWARE.
 '''
 
@@ -23,41 +23,55 @@ import os
 parentdir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 os.sys.path.insert(0,parentdir)
 import datetime, sys
-
+import MySQLdb as mdb                                                       #change !!!!!!!!!!!!!!!!!!!
+#import sqlite3 as lite
+#import sys
+#CONSTANTS
+#pathdb = '/root/Desktop/project/Record.db' #DB Path Changes on the main machine
+channel1 = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:4 Feeds\r\nN:Feeds;4;;;\r\nTEL;TYPE=cell:+919495895404\r\nPHOTO;BASE64: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\r\nEND:VCARD\r\n'#Channel list
+channel2 = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:4 Feeds\r\nN:Feeds;4;;;\r\nTEL;TYPE=cell:+919495932404\r\nPHOTO;BASE64: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\r\nEND:VCARD\r\n'#Channel list
+channel3 = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:4 Feeds\r\nN:Feeds;4;;;\r\nTEL;TYPE=cell:+919495653404\r\nPHOTO;BASE64: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\r\nEND:VCARD\r\n'#Channel list
+channel4 = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:4 Feeds\r\nN:Feeds;4;;;\r\nTEL;TYPE=cell:+919495257404\r\nPHOTO;BASE64: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\r\nEND:VCARD\r\n'#Channel list
+import time
+name = "CSE Radio"
+channelst=[channel1,channel2,channel3,channel4]# Added to list
+#
 if sys.version_info >= (3, 0):
 	raw_input = input
 
 from Yowsup.connectionmanager import YowsupConnectionManager
 
 class WhatsappListenerClient:
-	
+
 	def __init__(self, keepAlive = False, sendReceipts = False):
 		self.sendReceipts = sendReceipts
-		
+		wantsReceipt = True
+		self.sendReceipts = True
 		connectionManager = YowsupConnectionManager()
 		connectionManager.setAutoPong(keepAlive)
 
 		self.signalsInterface = connectionManager.getSignalsInterface()
 		self.methodsInterface = connectionManager.getMethodsInterface()
-		
+		#self.signalsInterface.registerListener("vcard_received", self.onMessageReceived)
 		self.signalsInterface.registerListener("message_received", self.onMessageReceived)
 		self.signalsInterface.registerListener("auth_success", self.onAuthSuccess)
 		self.signalsInterface.registerListener("auth_fail", self.onAuthFailed)
 		self.signalsInterface.registerListener("disconnected", self.onDisconnected)
-		
+	#	self.signalsInterface.registerListener("presence_updated", self.onPresenceUpdated)
 		self.cm = connectionManager
-	
+
 	def login(self, username, password):
 		self.username = username
 		self.methodsInterface.call("auth_login", (username, password))
-		
-		
+
+
 		while True:
-			raw_input()	
+			raw_input()
 
 	def onAuthSuccess(self, username):
 		print("Authed %s" % username)
 		self.methodsInterface.call("ready")
+    #self.methodsInterface.call("presence_sendAvailable")
 
 	def onAuthFailed(self, username, err):
 		print("Auth Failed!")
@@ -66,9 +80,76 @@ class WhatsappListenerClient:
 		print("Disconnected because %s" %reason)
 
 	def onMessageReceived(self, messageId, jid, messageContent, timestamp, wantsReceipt, pushName, isBroadCast):
-		formattedDate = datetime.datetime.fromtimestamp(timestamp).strftime('%d-%m-%Y %H:%M')
-		print("%s [%s]:%s"%(jid, formattedDate, messageContent))
 
-		if wantsReceipt and self.sendReceipts:
+		formattedDate = datetime.datetime.fromtimestamp(timestamp).strftime('%Y-%m-%d %H:%M:%S') # changed !!!!!!!!
+		print("%s [%s]:%s"%(jid, formattedDate, messageContent))
+		#DB CODE
+		try:
+
+			con = mdb.connect('localhost', 'root', 'toor', 'radio')			# changed !!!!!
+	    		cur = con.cursor()
+	    		cur.execute("SELECT JID,Date,Channel FROM Registration WHERE JID=%s",(jid,))
+			row = cur.fetchone()
+			if(row==None):
+				search_in_db = "Not Found"
+			else:
+				dat=row[1]#previous reg date
+				chl=row[2]#previous channel
+				search_in_db = "Found"
+			cur.execute("SELECT counted FROM Idcount ")
+			row = cur.fetchone()
+			if(row==None):
+				chid=0
+			else:
+				lid=row[0]
+				chid=int(0)
+	               	if (messageContent.upper() == "JOIN"):
+				if(search_in_db == "Not Found"):
+					print "HIT"
+					message = "Welcome to  CSE Radio"+'\xF0\x9F\x98\x83'
+					self.methodsInterface.call("message_send", (jid,message))
+	                                data = channel1 = 'BEGIN:VCARD\r\nVERSION:3.0\r\nFN:CSE Radio\r\nN:Radio;CSE;;;\r\nTEL;TYPE=cell:+919495895404\r\nPHOTO;BASE64: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\r\nEND:VCARD\r\n'#Channel list
+
+	                                self.methodsInterface.call("message_vcardSend",(jid,data, name))#data is the vcf file
+	                                message = "Please save this contact in your phone to complete registration"+'\xF0\x9F\x98\x8E'
+	                                self.methodsInterface.call("message_send", (jid,message))
+
+
+					cur.execute("INSERT INTO Registration(JID,Date,Channel) VALUES(%s, %s, %s)",(jid,formattedDate,chid))#DB code
+					con.commit()
+					lid = cur.lastrowid#DB
+		         		cur.execute("UPDATE Idcount SET counted=%s WHERE id=666", (lid,))#DB
+					con.commit()
+	               	if (messageContent.upper() == "JOIN"):
+				if(search_in_db == "Found"):
+					print "POOP"
+					message = "You are already registered."
+					self.methodsInterface.call("message_send", (jid,message))
+
+			if messageContent.upper() != "JOIN":
+				if(messageContent.upper() == "UNJOIN" and search_in_db== "Found"):	#small change in condition
+					print "Flush"
+					cur.execute("INSERT INTO Unreg(JID,regDate,unregDate,Channel) VALUES(%s, %s, %s, %s)",(jid,dat,formattedDate,chl))#DB Unreg
+					con.commit()
+					cur.execute("DELETE FROM Registration WHERE JID=%s",(jid,))#DB Reg
+					message = "We will miss you"+'\xF0\x9F\x98\xA2'+"\n"+"-Team CSE Radio "
+					con.commit()
+					self.methodsInterface.call("message_send", (jid,message))
+			if messageContent.upper() != "JOIN":
+				if(messageContent.upper() != "UNJOIN"):
+					print "SHIT"
+	        			message = "Please send JOIN to register with us . Thank you "
+					self.methodsInterface.call("message_send", (jid,message))
+		except mdb.Error, e:
+
+    			print "Error %d: %s" % (e.args[0],e.args[1])
+
 			self.methodsInterface.call("message_ack", (jid, messageId))
-	
+
+		finally:
+
+			#self.methodsInterface.call("message_ack", (jid, messageId))
+			if wantsReceipt and self.sendReceipts:
+				self.methodsInterface.call("message_ack", (jid, messageId))
+		#	print "Process complete"
+			con.close()
